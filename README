@@ -1,0 +1,166 @@
+;=========================================
+[02/28/25]
+;-----------------------------------------
+npm install -g pm2
+pm2 start cronJob.js --name duo-tracker
+pm2 save
+pm2 startup
+
+[meg@elias ~/js/next/duo-tracker]$ pm2 start src/cronJob.js --name duo-tracker
+[PM2] Starting /Users/meg/js/next/duo-tracker/src/cronJob.js in fork_mode (1 instance)
+[PM2] Done.
+┌────┬────────────────────┬──────────┬──────┬───────────┬──────────┬──────────┐
+│ id │ name               │ mode     │ ↺    │ status    │ cpu      │ memory   │
+├────┼────────────────────┼──────────┼──────┼───────────┼──────────┼──────────┤
+│ 0  │ duo-tracker        │ fork     │ 0    │ online    │ 0%       │ 996.0kb  │
+└────┴────────────────────┴──────────┴──────┴───────────┴──────────┴──────────┘
+[meg@elias ~/js/next/duo-tracker]$
+
+launchctl list
+pm2 status
+pm2 save
+
+pm2 startup
+sudo env PATH=$PATH:/usr/local/Cellar/node@20/20.18.1/bin /usr/local/lib/node_modules/pm2/bin/pm2 startup launchd -u meg --hp /Users/meg
+
+pm2 unstartup
+
+pm2 delete duo-tracker
+pm2 delete all
+
+pm2 save --force
+
+
+;-----------------------------------------
+curl -X GET "https://www.duolingo.com/2017-06-30/users?username=moff_moff"
+{"users":[{"joinedClassroomIds":[],"streak":428,"motivation":"travel","acquisitionSurveyReason":"friendsOrFamily","shouldForceConnectPhoneNumber":false,"picture":"//simg-ssl.duolingo.com/ssr-avatars/1339063544/SSR-i1vjPSPifo","learningLanguage":"de","hasFacebookId":false,"shakeToReportEnabled":null,"liveOpsFeatures":[],"canUseModerationTools":false,"id":1339063544,"betaStatus":"INELIGIBLE","hasGoogleId":true,"privacySettings":["DISABLE_THIRD_PARTY_TRACKING","DISABLE_PERSONALIZED_ADS"],"fromLanguage":"en","hasRecentActivity15":false,"_achievements":[],"observedClassroomIds":[],"username":"moff_moff","bio":"","profileCountry":null,"chinaUserModerationRecords":[],"globalAmbassadorStatus":{},"currentCourseId":"DUOLINGO_DE_EN","hasPhoneNumber":false,"creationDate":1703695727,"achievements":[],"hasPlus":true,"name":"Mame","roles":["users"],"classroomLeaderboardsEnabled":false,"emailVerified":true,"courses":[{"preload":false,"placementTestAvailable":false,"authorId":"duolingo","title":"German","learningLanguage":"de","xp":36536,"healthEnabled":true,"fromLanguage":"en","crowns":9999,"id":"DUOLINGO_DE_EN"},{"preload":false,"placementTestAvailable":false,"authorId":"duolingo","title":"Spanish","learningLanguage":"es","xp":104234,"healthEnabled":true,"fromLanguage":"en","crowns":9999,"id":"DUOLINGO_ES_EN"}],"totalXp":140770,"streakData":{"currentStreak":{"startDate":"2023-12-27","length":428,"endDate":"2025-02-28"}}}]}%
+
+
+;-----------------------------------------
+
+npx prisma migrate reset
+
+
+DUO_TRACKER
+
+moff_moff
+TwinOtter3779
+CircleSpac
+
+npm install dotenv
+docker exec -it duolingo-db psql -U meg -d duolingo
+
+(plan)
+
+npx prisma migrate dev --name init
+
+$ npx prisma migrate dev --name init
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": PostgreSQL database "duolingo", schema "public" at "localhost:5432"
+
+Applying migration `20250228143513_init`
+
+The following migration(s) have been created and applied from new schema changes:
+
+migrations/
+  └─ 20250228143513_init/
+    └─ migration.sql
+
+Your database is now in sync with your schema.
+
+✔ Generated Prisma Client (v6.4.1) to ./node_modules/@prisma/client in 76ms
+
+
+;--
+npx prisma migrate dev --name initial_setup
+npx prisma generate
+node src/app.js
+
+
+
+
+
+
+;=========================================
+[02/27/25]
+;-----------------------------------------
+
+curl -X GET "https://www.duolingo.com/2017-06-30/users\?username=moff_moff" \
+     -H
+1339063544
+
+
+;=========================================
+[02/26/25]
+;-----------------------------------------
+
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+
+;-----------------------------------------
+(get token)
+- open duolingo
+- open dev console => Cmd + Option + i
+- Network -> Fetch/XHR -> Headers
+- look for Authorizaion
+- argument of "Bearer" is the token
+
+
+(use token)
+curl -X GET "https://www.duolingo.com/2017-06-30/users\?username=moff_moff" \
+     -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjYzMDcyMDAwMDAsImlhdCI6MCwic3ViIjoxMzM5MDYzNTQ0fQ.uEBJQRsIAfWNKr_ojjStSNeYaAu-Eepsk7z5sZGvL7U"
+
+
+curl -X GET https://www.duolingo.com/2017-06-30/users\?username=moff_moff
+
+eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjYzMDcyMDAwMDAsImlhdCI6MCwic3ViIjoxMzM5MDYzNTQ0fQ.uEBJQRsIAfWNKr_ojjStSNeYaAu-Eepsk7z5sZGvL7U
+
+need to get every 1 hour or so.
+
+echo "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjYzMDcyMDAwMDAsImlhdCI6MCwic3ViIjoxMzM5MDYzNTQ0fQ.uEBJQRsIAfWNKr_ojjStSNeYaAu-Eepsk7z5sZGvL7U" | cut -d "." -f2 | base64 -d
+{"exp":6307200000,"iat":0,"sub":1339063544%
+
+npm run dev
+http://localhost:3000
+
+rm src/app
+
+npm run dev
+
+cd next/duo
+touch next.config.js
+
+{"users":[{"joinedClassroomIds":[],"streak":426,"motivation":"travel","acquisitionSurveyReason":"friendsOrFamily","shouldForceConnectPhoneNumber":false,"picture":"//simg-ssl.duolingo.com/ssr-avatars/1339063544/SSR-i1vjPSPifo","learningLanguage":"de","hasFacebookId":false,"shakeToReportEnabled":null,"liveOpsFeatures":[],"canUseModerationTools":false,"id":1339063544,"betaStatus":"INELIGIBLE","hasGoogleId":true,"privacySettings":["DISABLE_THIRD_PARTY_TRACKING","DISABLE_PERSONALIZED_ADS"],"fromLanguage":"en","hasRecentActivity15":false,"_achievements":[],"observedClassroomIds":[],"username":"moff_moff","bio":"","profileCountry":null,"chinaUserModerationRecords":[],"globalAmbassadorStatus":{},"currentCourseId":"DUOLINGO_DE_EN","hasPhoneNumber":false,"creationDate":1703695727,"achievements":[],"hasPlus":true,"name":"Mame","roles":["users"],"classroomLeaderboardsEnabled":false,"emailVerified":true,"courses":[{"preload":false,"placementTestAvailable":false,"authorId":"duolingo","title":"German","learningLanguage":"de","xp":35976,"healthEnabled":true,"fromLanguage":"en","crowns":9999,"id":"DUOLINGO_DE_EN"},{"preload":false,"placementTestAvailable":false,"authorId":"duolingo","title":"Spanish","learningLanguage":"es","xp":104234,"healthEnabled":true,"fromLanguage":"en","crowns":9999,"id":"DUOLINGO_ES_EN"}],"totalXp":140210,"streakData":{"currentStreak":{"startDate":"2023-12-27","length":426,"endDate":"2025-02-26"}}}]}
+
+;=========================================
+[02/25/25]
+;-----------------------------------------
+npx create-next-app@latest duo
+
+duolingo-dashboard/  # プロジェクトルート
+├── public/          # 静的ファイル（アイコン・画像など）
+├── src/
+│   ├── components/  # 再利用可能なUIコンポーネント
+│   │   ├── Chart.tsx  # EChartsのコンポーネント
+│   │   ├── Layout.tsx  # 共通レイアウト
+│   ├── pages/
+│   │   ├── index.tsx  # メインページ（グラフ表示）
+│   │   ├── api/
+│   │   │   ├── duolingo.ts  # Duolingo API 取得
+│   ├── styles/       # CSS / Tailwind CSS など
+│   │   ├── globals.css  # 全体のスタイル
+│   ├── utils/        # ヘルパー関数
+│   │   ├── fetchDuolingo.ts  # Duolingo API 取得用
+├── .env.local        # APIキーや環境変数
+├── package.json      # 依存関係
+├── tsconfig.json     # TypeScript 設定（TS使用時）
+└── README.md         # プロジェクト説明
+
+
+;=========================================
