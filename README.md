@@ -216,7 +216,7 @@ Install packages.
 <!--- ---------------------------------------- --->
 
 ```sh
-npm install @prisma/client axios dotenv pm2 node-cron
+npm install @prisma/client axios dotenv node-cron pm2 
 npm install -D prisma
 ```
 
