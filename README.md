@@ -1,4 +1,4 @@
-# DUO Daily Tracker!
+# Duolingo Daily Tracker!
 
 ## Motivation 
 
@@ -216,7 +216,7 @@ Install packages.
 <!--- ---------------------------------------- --->
 
 ```sh
-npm install @prisma/client axios dotenv pm2
+npm install @prisma/client axios dotenv pm2 node-cron
 npm install -D prisma
 ```
 
