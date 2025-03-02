@@ -15,7 +15,7 @@ export async function saveXPData(usersData) {
         console.log(`✅ Start saving data: user ${username}, XP ${totalXp}`);
 
         //        const today = new Date().toISOString().split('T')[0];
-        const today = new Date()
+        const today = new Date().toISOString().split('T')[0];
         today.setHours(0, 0, 0, 0);
 
         const user = await prisma.user.upsert({
@@ -40,7 +40,8 @@ export async function saveXPData(usersData) {
             where: { userId_date: { userId: user.id, date: today } }
         });
 
-        const dailyXp = previousEntry ? totalXp - previousEntry.totalXp : totalXp;
+        const previousTotalXp = previousEntry ? previousEntry.totalXp : 0;
+        const dailyXp = totalXp - previousTotalXp;
 
         await prisma.xPEntry.upsert({
             where: { userId_date: { userId: user.id, date: today } },

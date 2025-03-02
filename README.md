@@ -577,6 +577,12 @@ duolingo=# select * from "XPEntry";
  ....
 duolingo=# \q
 ```
+or, 
+
+```sh
+psql -h localhost -p 5432 -U myuser -d mydatabase
+```
+
 
 All right.
 
