@@ -24,7 +24,6 @@ and automated it with the combination of Next.js, poastgreSQL, prisma and pm2.
     + fetchData.js
     + saveData.js
     + app.js
-    + cronJob.js
 
 6. Test if I can fetch data from Duolingo and store it in postgreSQL.
 
@@ -193,7 +192,6 @@ $ mkdir -p src/services
 $ touch src/services/fetchData.js
 $ touch src/services/saveData.js
 $ touch src/app.js
-$ touch src/cronJob.js
 ```
 
 ```sh
@@ -205,7 +203,6 @@ $ tree ./src
 │   ├── layout.tsx
 │   └── page.tsx
 ├── app.js
-├── cronJob.js
 └── services
     ├── fetchData.js
     └── saveData.js
@@ -216,7 +213,7 @@ Install packages.
 <!--- ---------------------------------------- --->
 
 ```sh
-npm install @prisma/client axios dotenv node-cron pm2 
+npm install @prisma/client axios dotenv pm2 
 npm install -D prisma
 ```
 
@@ -455,13 +452,12 @@ Now we can use `PrismaClient` inside JavaScript code.
     + fetchData.js
     + saveData.js
     + app.js
-    + cronJob.js
 
 **`fetchData.js`** is contact to Duolingo API and fetch XP data of given users.
 
 **`saveData.js`** stores the data in postgresSQL using prisma client. 
 
-**`app.js`** is used to test all the above. When the daemon process started, we 
+**`app.js`** is used to run all the above. When the daemon process started, we 
 do not use `app.js` any more. 
 
 **`cronJob.js`** is to execute `fetchData.js` and `saveData.js` once a day.
@@ -648,7 +644,7 @@ All right.
 <!--- --------------------------------------------------------- --->
 ## 7. Set up daily fetch with pm2. 
 
-`cronJob.js` looks like this. 
+We will run `cronJob.js` as a daemon.
 
 ```js
 import cron from 'node-cron';
@@ -687,21 +683,61 @@ cron.schedule('0 2 * * *', async () => {
 
 ⏰ **This will execute the task every day at 2 AM (02:00).** 🚀
 
-We will run `cronJob.js` as a daemon.
 
 ```sh
-pm2 start src/cronJob.js --name duolingo-cron
+NODE_PATH=$(npm root) pm2 start ./src/cronJob.js --name duo-tracker 
 ```
+
+Check if the environment variable is properly handed over.
+
+
+<!--
+We will run `app.js` regularly instead. 
+```sh
+pm2 start src/app.js --name duo-tracker --cron "0 2 * * *"
+```
+-->
+
+Check it
 
 ```sh
 pm2 list
+pm2 env 0
+pm2 info 0
+pm2 status
+pm2 logs duo-tracker
 ```
+`0` is an ID of the daemon.
+
+
 ![pm2 list](./images/pm2-list-1.png)
+
+Register duo-tracker to the daemon list.
 
 ```sh
 pm2 save
-pm2 startup
 ```
+
+To stop and remove duo-tracker.
+```sh
+pm2 stop duo-tracker
+pm2 delete duo-tracker
+```
+
+To stop and remove all daemons.
+```sh
+pm2 stop all
+pm2 delete all
+```
+
+To flush log.
+```sh
+pm2 flush
+rm -rf $HOME/.pm2/duo-tracker*.log
+```
+
+
+<!-- --------------------------------------- -->
 
 In order to restart `pm2` itself every time my laptop is rebooted,
 
@@ -712,7 +748,7 @@ $ sudo env PATH=$PATH:/usr/local/Cellar/node@20/20.18.1/bin /usr/local/lib/node_
 like, 
 
 ```sh
-$ sudo env PATH=$PATH:/usr/local/Cellar/node@20/20.18.1/bin /usr/local/lib/node_modules/pm2/bin/pm2 startup launchd -u john --hp /Users/john
+$ sudo env PATH=$PATH:/usr/local/Cellar/node@20/20.18.1/bin /usr/local/lib/node_modules/pm2/bin/pm2 startup launchd -u meg --hp /Users/meg
 
 Password:
 [PM2] Init System found: launchd
@@ -744,10 +780,23 @@ $ pm2 save
 $ pm2 unstartup launchd
 ```
 
-To remove all daemons.
+Check if pm2 is in launchd,
+```sh
+ls ~/Library/LaunchAgents | grep pm2
 ```
-pm2 stop all
-pm2 delete all
+
+<!--
+launchctl list | grep pm2
+-->
+Remove from launchd list. 
+
+```
+launchctl bootout gui/$(id -u) ~/Library/LaunchAgents/pm2.meg.plistaun
+```
+
+In case, we have to manually load pm2 to launch list,
+```sh
+launchctl load ~/Library/LaunchAgents/pm2.meg.plist
 ```
 
 <!--- --------------------------------------------------------- --->

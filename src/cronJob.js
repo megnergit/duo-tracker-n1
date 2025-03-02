@@ -1,4 +1,9 @@
 import cron from 'node-cron';
+
+// import("node-cron").then((cron) => {
+//   console.log("Cron loaded:", cron);
+// });
+
 import { fetchDuolingoData } from './services/fetchData.js';
 import { saveXPData } from './services/saveData.js';
 
