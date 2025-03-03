@@ -10,14 +10,15 @@ export async function fetchDuolingoData() {
     for (const username of DUOLINGO_USERS) {
 
         try {
+            //            console.log(`Username: ${username}`);
             const url = `https://www.duolingo.com/2017-06-30/users?username=${username.trim()}`;
             console.log(`🌍 Fetching: ${url}`);
-
 
             const res = await axios.get(url, {
                 headers: {
 
-                    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36',
+                    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) ' +
+                        'AppleWebKit / 537.36(KHTML, like Gecko) Chrome/ 133.0.0.0 Safari/ 537.36',
                     'Accept': 'application/json'
                 }
             });

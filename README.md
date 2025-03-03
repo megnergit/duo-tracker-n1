@@ -24,6 +24,7 @@ and automated it with the combination of Next.js, poastgreSQL, prisma and pm2.
     + fetchData.js
     + saveData.js
     + app.js
+    + cronJob.js
 
 6. Test if I can fetch data from Duolingo and store it in postgreSQL.
 
@@ -203,6 +204,7 @@ $ tree ./src
 │   ├── layout.tsx
 │   └── page.tsx
 ├── app.js
+├── cronJob.js
 └── services
     ├── fetchData.js
     └── saveData.js
@@ -583,6 +585,10 @@ or,
 psql -h localhost -p 5432 -U myuser -d mydatabase
 ```
 
+To sort the database,
+```
+duolingo=# select * from "XPEntry" order by "createdAt" ASC;
+```
 
 All right.
 
@@ -695,6 +701,21 @@ NODE_PATH=$(npm root) pm2 start ./src/cronJob.js --name duo-tracker
 ```
 
 Check if the environment variable is properly handed over.
+
+For debugging, insert
+```js
+debugger;
+```
+at the point that you want the execution to halt,
+and run the code with `--inspect`
+```sh
+node --inspect src/app.js
+```
+or
+```sh
+node --inspect-brk src/app.js
+```
+
 
 
 <!--
